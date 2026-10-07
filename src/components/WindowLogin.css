@@ -1,0 +1,531 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap');
+
+body {
+  margin: 0;
+}
+
+/* ===== Ruangan + variabel tema per cuaca ===== */
+.room {
+  --wall: #eadfca;
+  --hill: #5bb25a;
+  --hill-back: #7cc66f;
+  --cloud: #ffffff;
+  --card-bg: rgba(255, 255, 255, 0.55);
+  --blur: 6px;
+  --ink: #1d3557;
+  --input-bg: rgba(255, 255, 255, 0.5);
+  --accent: #f59e0b;
+  --accent-ink: #3a2500;
+
+  min-height: 100vh;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 480px);
+  justify-content: center;
+  align-content: center;
+  gap: 14px;
+  padding: 24px 16px;
+  background: var(--wall);
+  font-family: 'Nunito', system-ui, sans-serif;
+  transition: background-color 1s ease;
+}
+
+.room *,
+.room *::before,
+.room *::after {
+  box-sizing: border-box;
+}
+
+.weather-rainy {
+  --wall: #c9d0d6;
+  --hill: #3f6b4a;
+  --hill-back: #56806a;
+  --cloud: #6f7a85;
+  --card-bg: rgba(225, 232, 240, 0.35);
+  --blur: 14px;
+  --ink: #14202b;
+  --input-bg: rgba(255, 255, 255, 0.3);
+  --accent: #3f86bd;
+  --accent-ink: #ffffff;
+}
+
+.weather-night {
+  --wall: #1a2038;
+  --hill: #14301f;
+  --hill-back: #1d4230;
+  --cloud: #3a4468;
+  --card-bg: rgba(30, 36, 70, 0.6);
+  --blur: 10px;
+  --ink: #f5f1e0;
+  --input-bg: rgba(255, 255, 255, 0.1);
+  --accent: #ffc857;
+  --accent-ink: #2a2000;
+}
+
+/* ===== Jendela ===== */
+.window {
+  padding: 14px;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #a8744a, #7a4e2d);
+  box-shadow:
+    0 24px 40px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.15);
+}
+
+.glass {
+  position: relative;
+  min-height: 560px;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  overflow: hidden;
+  border-radius: 6px;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.25);
+}
+
+/* ===== Langit ===== */
+.scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.sky {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.sky-sunny { background: linear-gradient(#5fb4f2, #bfe6ff 70%, #fff3c4); }
+.sky-rainy { background: linear-gradient(#5b6773, #8d98a3 70%, #aab4bd); }
+.sky-night { background: linear-gradient(#0a1030, #1c2a5e 70%, #35467d); }
+
+.weather-sunny .sky-sunny,
+.weather-rainy .sky-rainy,
+.weather-night .sky-night {
+  opacity: 1;
+}
+
+/* Matahari */
+.sun {
+  position: absolute;
+  top: 40px;
+  right: 50px;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff7b0, #ffcf33 70%);
+  box-shadow: 0 0 50px 20px rgba(255, 220, 90, 0.55);
+  opacity: 0;
+  transform: translateY(60px);
+  transition: opacity 1s ease, transform 1s ease;
+}
+
+.sun::before {
+  content: '';
+  position: absolute;
+  inset: -34px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    rgba(255, 230, 120, 0.55) 0 8deg,
+    transparent 8deg 24deg
+  );
+  -webkit-mask-image: radial-gradient(circle, transparent 38%, #000 40%, transparent 70%);
+  mask-image: radial-gradient(circle, transparent 38%, #000 40%, transparent 70%);
+  animation: spin 40s linear infinite;
+}
+
+.weather-sunny .sun {
+  opacity: 1;
+  transform: none;
+}
+
+/* Bulan sabit */
+.moon {
+  position: absolute;
+  top: 46px;
+  right: 56px;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  box-shadow: inset -16px -4px 0 0 #f5f2d6, 0 0 30px rgba(245, 242, 214, 0.35);
+  opacity: 0;
+  transform: translateY(60px);
+  transition: opacity 1s ease, transform 1s ease;
+}
+
+.weather-night .moon {
+  opacity: 1;
+  transform: none;
+}
+
+/* Bintang */
+.stars {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.weather-night .stars {
+  opacity: 1;
+}
+
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  animation: twinkle 2.5s ease-in-out infinite;
+}
+
+/* Awan */
+.cloud {
+  position: absolute;
+  width: 110px;
+  height: 34px;
+  border-radius: 40px;
+  background: var(--cloud);
+  transition: background-color 1s ease, opacity 1s ease;
+  animation: drift linear infinite;
+}
+
+.cloud::before,
+.cloud::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: inherit;
+}
+
+.cloud::before { width: 50px; height: 50px; left: 18px; top: -24px; }
+.cloud::after  { width: 60px; height: 60px; left: 48px; top: -32px; }
+
+.c1 { top: 90px;  animation-duration: 55s; animation-delay: -10s; }
+.c2 { top: 190px; animation-duration: 75s; animation-delay: -40s; transform-origin: left; scale: 0.8; }
+.c3 { top: 290px; animation-duration: 65s; animation-delay: -25s; scale: 1.2; }
+
+.weather-night .cloud { opacity: 0.6; }
+
+/* Bukit */
+.hills {
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  bottom: -60px;
+  height: 160px;
+  border-radius: 50% 50% 0 0;
+  background: var(--hill);
+  transition: background-color 1s ease;
+}
+
+.hills::before {
+  content: '';
+  position: absolute;
+  left: 30%;
+  right: -30%;
+  top: -40px;
+  height: 140px;
+  border-radius: 50% 50% 0 0;
+  background: var(--hill-back);
+  z-index: -1;
+  transition: background-color 1s ease;
+}
+
+/* ===== Hujan ===== */
+.rain {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1s ease;
+}
+
+.rain.is-active {
+  opacity: 1;
+}
+
+.drop {
+  position: absolute;
+  top: -60px;
+  left: var(--x);
+  width: 2px;
+  height: var(--h);
+  background: linear-gradient(transparent, rgba(215, 232, 255, 0.85));
+  animation: fall var(--d) linear infinite;
+  animation-delay: var(--delay);
+}
+
+.slide {
+  position: absolute;
+  top: -20px;
+  left: var(--x);
+  width: var(--s);
+  height: calc(var(--s) * 1.5);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: inset -1px -1px 2px rgba(255, 255, 255, 0.6);
+  animation: slide var(--d) ease-in infinite;
+  animation-delay: var(--delay);
+}
+
+/* Kilat */
+.lightning {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.lightning.on {
+  animation: flash 0.6s ease-out;
+}
+
+/* ===== Kartu form ===== */
+.card {
+  position: relative;
+  z-index: 5;
+  width: min(340px, 100%);
+  padding: 26px 24px;
+  border-radius: 18px;
+  color: var(--ink);
+  background: var(--card-bg);
+  -webkit-backdrop-filter: blur(var(--blur));
+  backdrop-filter: blur(var(--blur));
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  transition: background-color 1s ease, color 1s ease;
+}
+
+.card h2 {
+  margin: 0;
+  font-size: 1.7rem;
+  font-weight: 800;
+}
+
+.card .sub {
+  margin: 4px 0 18px;
+  opacity: 0.8;
+}
+
+.field {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 14px;
+}
+
+.field label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.field input {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  font: inherit;
+  color: var(--ink);
+  background: var(--input-bg);
+  border: 1.5px solid transparent;
+  border-radius: 10px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.field input::placeholder {
+  color: inherit;
+  opacity: 0.5;
+}
+
+.field input:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.field input[aria-invalid='true'] {
+  border-color: #d64545;
+}
+
+.err {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #c62828;
+}
+
+.weather-night .err {
+  color: #ff8a80;
+}
+
+.pw {
+  position: relative;
+}
+
+.pw input {
+  padding-right: 44px;
+}
+
+.pw-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 44px;
+  height: 44px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-size: 1.1rem;
+}
+
+.btn {
+  width: 100%;
+  height: 46px;
+  margin-top: 4px;
+  font: 800 1rem 'Nunito', system-ui, sans-serif;
+  color: var(--accent-ink);
+  background: var(--accent);
+  border: 0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.2s ease, background-color 1s ease;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.07);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.btn:focus-visible,
+.sill-btn:focus-visible,
+.pw-toggle:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.card-success {
+  text-align: center;
+}
+
+.check {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 10px;
+  display: grid;
+  place-items: center;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--accent-ink);
+  background: var(--accent);
+  border-radius: 50%;
+  animation: pop 0.4s ease;
+}
+
+.shake {
+  animation: shake 0.45s ease;
+}
+
+/* ===== Ambang jendela (toggle cuaca) ===== */
+.sill {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #9a6a43, #75492a);
+  box-shadow: 0 8px 14px rgba(0, 0, 0, 0.25);
+}
+
+.sill-btn {
+  flex: 1;
+  padding: 10px 8px;
+  font: 700 0.95rem 'Nunito', system-ui, sans-serif;
+  color: #f6e9d8;
+  background: rgba(0, 0, 0, 0.18);
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+
+.sill-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.sill-btn.is-on {
+  color: #3b2412;
+  background: #f6e9d8;
+  transform: translateY(-1px);
+}
+
+/* ===== Keyframes ===== */
+@keyframes fall {
+  to { transform: translateY(680px); }
+}
+
+@keyframes slide {
+  0%   { transform: translateY(0); opacity: 0; }
+  10%  { opacity: 1; }
+  100% { transform: translateY(600px); opacity: 0.8; }
+}
+
+@keyframes drift {
+  from { transform: translateX(-160px); }
+  to   { transform: translateX(560px); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50%      { opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes flash {
+  0%   { opacity: 0; }
+  10%  { opacity: 0.85; }
+  25%  { opacity: 0.1; }
+  40%  { opacity: 0.6; }
+  100% { opacity: 0; }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-9px); }
+  40%      { transform: translateX(8px); }
+  60%      { transform: translateX(-6px); }
+  80%      { transform: translateX(4px); }
+}
+
+@keyframes pop {
+  0%   { transform: scale(0.4); }
+  70%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* ===== Aksesibilitas: kurangi gerakan ===== */
+@media (prefers-reduced-motion: reduce) {
+  .room *,
+  .room *::before,
+  .room *::after {
+    animation: none !important;
+    transition-duration: 0.01s !important;
+  }
+
+  .drop,
+  .slide {
+    display: none;
+  }
+}

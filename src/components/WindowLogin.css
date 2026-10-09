@@ -529,3 +529,323 @@ body {
     display: none;
   }
 }
+
+/* ===== Parallax (mengikuti pointer) ===== */
+.glass {
+  --px: 0;
+  --py: 0;
+}
+
+.sun,
+.moon {
+  translate: calc(var(--px) * -14px) calc(var(--py) * -10px);
+}
+
+.cloud {
+  translate: calc(var(--px) * -26px) calc(var(--py) * -12px);
+}
+
+.stars {
+  translate: calc(var(--px) * -8px) calc(var(--py) * -6px);
+}
+
+.hills {
+  translate: calc(var(--px) * 10px) calc(var(--py) * 4px);
+}
+
+/* ===== Tirai ===== */
+.curtain {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 52%;
+  z-index: 3;
+  background: repeating-linear-gradient(
+    90deg,
+    #b5383f 0,
+    #8f242c 14px,
+    #b5383f 28px
+  );
+  box-shadow: inset 0 -40px 50px rgba(0, 0, 0, 0.25),
+    0 0 24px rgba(0, 0, 0, 0.35);
+  transition: transform 1.1s cubic-bezier(0.6, 0, 0.3, 1);
+  pointer-events: none;
+}
+
+.curtain-l {
+  left: 0;
+  transform: translateX(-105%);
+}
+
+.curtain-r {
+  right: 0;
+  transform: translateX(105%);
+}
+
+/* tertutup: awal halaman dan setelah login berhasil */
+.is-closed .curtain-l,
+.is-closed .curtain-r {
+  transform: none;
+}
+
+/* Kartu "Selamat datang" dibuat lebih pekat agar terbaca di depan tirai */
+.card-success {
+  --ink: #3b2412;
+  background: rgba(255, 248, 235, 0.92);
+}
+
+/* Kurangi gerakan untuk pengguna yang memilih itu */
+@media (prefers-reduced-motion: reduce) {
+  .sun,
+  .moon,
+  .cloud,
+  .stars,
+  .hills {
+    translate: none;
+  }
+}
+
+/* ===== Tali tirai ===== */
+.cord {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 6;
+  width: 120px;
+  margin-left: -60px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  animation: bob 2.4s ease-in-out infinite;
+  transition: transform 0.5s ease, opacity 0.4s ease 0.3s,
+    visibility 0s linear 0.8s;
+}
+
+.cord-line {
+  width: 3px;
+  height: 90px;
+  background: #e8d9b8;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+}
+
+.cord-knob {
+  width: 22px;
+  height: 30px;
+  border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+  background: radial-gradient(circle at 35% 30%, #ffe08a, #d9a21b 70%);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+.cord-hint {
+  margin-top: 12px;
+  padding: 6px 14px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #fff;
+  white-space: nowrap;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 999px;
+}
+
+.cord:hover .cord-knob {
+  filter: brightness(1.15);
+}
+
+.cord:focus-visible {
+  outline: none;
+}
+
+.cord:focus-visible .cord-knob {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+/* setelah ditarik: turun sedikit lalu hilang */
+.cord.is-pulled {
+  animation: none;
+  transform: translateY(40px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(8px); }
+}
+
+/* ===== Form tersembunyi sampai tirai dibuka ===== */
+.form-wrap {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(14px);
+  transition: opacity 0.6s ease, transform 0.6s ease,
+    visibility 0s linear 0.6s;
+}
+
+.form-wrap.is-active {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity 0.7s ease 0.7s, transform 0.7s ease 0.7s,
+    visibility 0s linear 0.7s;
+}
+
+/* ===== Form tersembunyi sampai jendela dibuka ===== */
+.form-wrap {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(14px);
+  transition: opacity 0.6s ease, transform 0.6s ease,
+    visibility 0s linear 0.6s;
+}
+
+.form-wrap.is-active {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity 0.7s ease 0.5s, transform 0.7s ease 0.5s,
+    visibility 0s linear 0.5s;
+}
+
+/* ===== Jendela sash (diangkat ke atas) ===== */
+.sash {
+  --wood: #8a5a36;
+  position: absolute;
+  inset: 0;
+  z-index: 3;               /* setelah login: di belakang kartu */
+  pointer-events: none;
+  transition: transform 0.9s cubic-bezier(0.5, 0, 0.2, 1);
+}
+
+.sash.is-initial {
+  z-index: 7;               /* di awal: menutupi semuanya */
+}
+
+.sash.is-dragging {
+  transition: none;         /* mengikuti jari/mouse tanpa jeda */
+}
+
+.sash.is-lifted {
+  transform: translateY(-104%);
+}
+
+/* bingkai kayu + sekat kaca 2 kolom x 3 baris */
+.sash-panes {
+  position: absolute;
+  inset: 0;
+  border: 12px solid var(--wood);
+  border-radius: 4px;
+  background:
+    linear-gradient(90deg, transparent calc(50% - 4px), var(--wood) 0 calc(50% + 4px), transparent 0),
+    linear-gradient(180deg, transparent calc(33.33% - 4px), var(--wood) 0 calc(33.33% + 4px), transparent 0),
+    linear-gradient(180deg, transparent calc(66.66% - 4px), var(--wood) 0 calc(66.66% + 4px), transparent 0),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.28), transparent 40%, rgba(255, 255, 255, 0.1));
+  -webkit-backdrop-filter: blur(1.5px);
+  backdrop-filter: blur(1.5px);
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.18),
+    0 6px 18px rgba(0, 0, 0, 0.3);
+}
+
+/* palang bawah yang lebih tebal (tempat gagang) */
+.sash-panes::after {
+  content: '';
+  position: absolute;
+  left: -12px;
+  right: -12px;
+  bottom: -12px;
+  height: 44px;
+  background: linear-gradient(#9a6a43, #75492a);
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.25);
+}
+
+/* gagang + petunjuk */
+.sash-handle {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  translate: -50% 0;
+  width: 260px;
+  height: 120px;
+  padding: 0 0 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  background: none;
+  border: 0;
+  cursor: grab;
+  touch-action: none;       /* supaya geser jari tidak menggulir halaman */
+  pointer-events: auto;
+  transition: opacity 0.4s ease;
+}
+
+.sash-handle:active {
+  cursor: grabbing;
+}
+
+.sash-grip {
+  position: relative;
+  width: 140px;
+  height: 24px;
+  border-radius: 8px;
+  background: linear-gradient(#e6bd82, #a8743a);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.sash-grip::before {
+  content: '';
+  position: absolute;
+  inset: 7px 14px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.28) 0 2px,
+    transparent 2px 10px
+  );
+}
+
+.sash-hint {
+  padding: 6px 14px;
+  font: 800 0.9rem 'Nunito', system-ui, sans-serif;
+  color: #fff;
+  white-space: nowrap;
+  background: rgba(20, 32, 43, 0.6);
+  border-radius: 999px;
+  animation: lift-hint 1.8s ease-in-out infinite;
+}
+
+.sash-handle:focus-visible {
+  outline: none;
+}
+
+.sash-handle:focus-visible .sash-grip {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+/* setelah jendela dibuka, gagang tidak dipakai lagi */
+.sash.is-open .sash-handle {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes lift-hint {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}

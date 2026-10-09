@@ -9,7 +9,7 @@ const TEXT = {
   night: { title: 'Selamat malam', sub: 'Sudah larut, masuk dulu ya.' },
 };
 
-export default function LoginForm({ weather, onError }) {
+export default function LoginForm({ weather, onError, onSuccess, onLogout }) {
   const [form, setForm] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState('idle'); // idle | loading | success
@@ -52,6 +52,7 @@ export default function LoginForm({ weather, onError }) {
     setTimeout(() => {
       if (form.password === DEMO_PASSWORD) {
         setStatus('success');
+        onSuccess(); // ← baru: tirai menutup
       } else {
         setStatus('idle');
         setErrors({ password: 'Password salah. Coba: jendela123' });
@@ -64,6 +65,7 @@ export default function LoginForm({ weather, onError }) {
     setForm({ email: '', password: '' });
     setErrors({});
     setStatus('idle');
+    onLogout(); // ← baru: tirai terbuka lagi
   };
 
   if (status === 'success') {
